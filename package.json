@@ -1,7 +1,6 @@
 {
   "name": "todolist-v1",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,8 +8,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "ejs": "^2.6.1",
-    "express": "^4.16.3"
-  }
+    "body-parser": "^1.20.1",
+    "ejs": "^2.7.4",
+    "express": "^4.18.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DusanVelimirovic/to-do-application.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DusanVelimirovic/to-do-application/issues"
+  },
+  "homepage": "https://github.com/DusanVelimirovic/to-do-application#readme",
+  "description": ""
 }
