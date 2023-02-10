@@ -38,42 +38,44 @@ const item3 = new Item ({
 
 const defaultItems = [item1, item2, item3];
 
-//insert new Documents into DB
-/*
-Item.insertMany(defaultItems, function(err){
-  if(err){
-    console.log(err);
-  } else {
-    console.log("Successfully saved default items to DB.");
-  }
-});*/
-
-Item.insertMany( defaultItems ).then(function(){
-  console.log("Data inserted")  // Success
-}).catch(function(error){
-  console.log("Data not inserted")      // Failure
-});
 
 
+//get items from db
 app.get("/", function(req, res) {
 
 const day = date.getDate();
 
-  res.render("list", {listTitle: day, newListItems: items});
+  //find items from db
+  Item.find({}, function(err, foundItems){
 
+    if(foundItems.length === 0){
+      //insert new Documents into DB
+      Item.insertMany(defaultItems, function(err){
+        if(err){
+          console.log(err);
+        } else {
+          console.log("Successfully saved default items to DB.");
+        }
+        });
+        res.redirect("/");
+    } else {
+      res.render("list", {listTitle: day, newListItems: foundItems});
+    }
+  });
 });
 
+//add items to db
 app.post("/", function(req, res){
 
-  const item = req.body.newItem;
+  const itemName = req.body.newItem;
+  
+  //insert new item into DB
+  const item = new Item({
+    name: itemName
+  });
+  item.save();
 
-  if (req.body.list === "Work") {
-    workItems.push(item);
-    res.redirect("/work");
-  } else {
-    items.push(item);
-    res.redirect("/");
-  }
+  res.redirect("/");
 });
 
 app.get("/work", function(req,res){
