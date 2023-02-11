@@ -6,10 +6,13 @@ const mongoose = require('mongoose');
 const Item = require("./models/Item");
 const List = require("./models/List");
 const dotenv = require("dotenv");
+const _ = require("lodash");
 
 dotenv.config();
 
 const app = express();
+
+const day = date.getDate();
 
 //allow ejs in app
 app.set('view engine', 'ejs');
@@ -66,7 +69,7 @@ const day = date.getDate();
 
 //multiple lists, dynamic routes
 app.get("/:costumListName", function(req,res){
-  const costumListName = req.params.costumListName;
+  const costumListName = _.capitalize(req.params.costumListName);
 
   List.findOne({name:costumListName}, function(err,foundList){
     if(!err){
@@ -89,8 +92,6 @@ app.get("/:costumListName", function(req,res){
 
 //add items to db
 app.post("/", function(req, res){
-
-  const day = date.getDate();
 
   const itemName = req.body.newItem;
   const listName = req.body.list;
@@ -115,14 +116,22 @@ app.post("/", function(req, res){
 //delete document from collection
 app.post("/delete", function(req,res){
   const checkedItemId = req.body.checkbox;
+  const listName = req.body.listName;
 
-  Item.findByIdAndRemove(checkedItemId, function(err){
-    if(!err){
-      console.log("Successfully deleted checked item");
-      res.redirect("/");
+  if(listName === day){
+    Item.findByIdAndRemove(checkedItemId, function(err){
+      if(!err){
+        console.log("Successfully deleted checked item");
+        res.redirect("/");
+      }
+    });
+  } else {
+    List.findOneAndUpdate({name:listName}, {$pull:{items: {_id:checkedItemId}}}, function(err,foundList){
+      if(!err){
+        res.redirect("/" + listName);
+      }
+    });
     }
-  });
-
 })
 
 app.get("/work", function(req,res){
