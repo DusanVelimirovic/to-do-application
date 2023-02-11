@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const date = require(__dirname + "/date.js");
 const mongoose = require('mongoose');
 const Item = require("./models/Item");
+const List = require("./models/List");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -39,7 +40,6 @@ const item3 = new Item ({
 const defaultItems = [item1, item2, item3];
 
 
-
 //get items from db
 app.get("/", function(req, res) {
 
@@ -63,6 +63,33 @@ const day = date.getDate();
     }
   });
 });
+
+//multiple lists, dynamic routes
+app.get("/:costumListName", function(req,res){
+  const costumListName = req.params.costumListName;
+
+  List.findOne({name:costumListName}, function(err,foundList){
+    if(!err){
+      if(!foundList){
+        //create a new List
+        const list = new List({
+          name:costumListName,
+          items:defaultItems
+        });
+      
+        list.save();
+        res.redirect("/" + costumListName);
+      } else {
+        //show an existing list
+        res.render("list", {listTitle: foundList.name, newListItems: foundList.items});
+      }
+    }
+  })
+
+
+
+
+})
 
 //add items to db
 app.post("/", function(req, res){
