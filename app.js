@@ -85,24 +85,31 @@ app.get("/:costumListName", function(req,res){
       }
     }
   })
-
-
-
-
 })
 
 //add items to db
 app.post("/", function(req, res){
 
+  const day = date.getDate();
+
   const itemName = req.body.newItem;
+  const listName = req.body.list;
   
   //insert new item into DB
   const item = new Item({
     name: itemName
   });
-  item.save();
 
-  res.redirect("/");
+  if (listName === day){
+    item.save();
+    res.redirect("/");
+  } else {
+    List.findOne({name:listName}, function(err, foundList){
+      foundList.items.push(item);
+      foundList.save();
+      res.redirect("/" + listName);
+    })
+  }
 });
 
 //delete document from collection
